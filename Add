@@ -8,3 +8,25 @@
         }
         System.out.println(positionQuantity);
         long quantityInput = tradeInformation.userInputQuantity(scanner, tradeTypeInput, positionQuantity);
+
+
+private long userInputQuantity(Scanner scanner, TradeType tradeType, long quantity) {
+        while (true) {
+            System.out.print("株数(100単位)を入力してください（半角整数）");
+            String quantityInput = scanner.nextLine();
+            if (quantityInput.length() > 8) {
+                System.out.println("8桁以内の数値を入力してください。");
+            } else if (quantityInput.matches("^[a-zA-Z][a-z/ .,A-Z]+$")) {
+                System.out.println("数値が正しくありません。");
+            } else if (quantityInput.contains(".")) {
+                System.out.println("正しい数値ではありません");
+            } else if (Long.parseLong(quantityInput) > 0 && Long.parseLong(quantityInput) % 100 == 0) {
+                if (tradeType == TradeType.SELL && Long.parseLong(quantityInput) > quantity) {
+                    System.out.println("保有している株価の数を超えている　再入力してください");
+                }
+                return Long.parseLong(quantityInput);
+            } else {
+                System.out.println("100単位ではありません");
+            }
+        }
+    }
