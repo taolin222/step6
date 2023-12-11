@@ -1,0 +1,10 @@
+ Position position = Portoflio.getInstance().getPositionByCode(codeInput);
+        //売買区分メソッドを呼び出す
+        TradeType tradeTypeInput = tradeInformation.userInputTradeType(scanner);
+        //株式数メソッドを呼び出す
+        long positionQuantity = 0;
+        if (position != null) {
+            positionQuantity = position.getQuantity();
+        }
+        System.out.println(positionQuantity);
+        long quantityInput = tradeInformation.userInputQuantity(scanner, tradeTypeInput, positionQuantity);
