@@ -1,0 +1,61 @@
+public class Portoflio {
+
+    private final Map<String, Position> positionMap = new HashMap<>();
+
+    private final Map<String, BigDecimal> lastPriceMap = new HashMap<>();
+
+
+    public Portoflio() {
+
+    }
+
+    public static final Portoflio portoflio = new Portoflio();
+
+    public static Portoflio getInstance() {
+        return portoflio;
+    }
+
+
+    public void updatePosition(Trade trade) {
+        if (positionMap.containsKey(trade.getCode())) {
+            Position position = positionMap.get(trade.getCode());
+
+            if (trade.getTradeType() == TradeType.BUY) {
+                position.add(trade.getQuantity(), trade.getUnitPrice());
+            } else {
+                position.sell(trade.getQuantity(), trade.getUnitPrice());
+            }
+        } else {
+            Position position = new Position(trade.getCode(), trade.getQuantity(), trade.getUnitPrice());
+            positionMap.put(trade.getCode(), position);
+        }
+    }
+
+
+    public List<Position> getPositions() {
+        List<Position> lst = new ArrayList<>(positionMap.values());
+        Position.sortPositions(lst);
+        return lst;
+    }
+
+
+    public Position getPositionByCode(String code) {
+        return positionMap.get(code);
+    }
+
+    public void clear() {
+        positionMap.clear();
+    }
+
+
+    public void setLastPrice(String code, BigDecimal price) {
+        this.lastPriceMap.put(code, price);
+    }
+
+
+    public BigDecimal getLastPrice(String code) {
+        return this.lastPriceMap.get(code);
+    }
+
+
+}
