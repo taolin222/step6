@@ -1,0 +1,10 @@
+case "5":
+                        System.out.println("ポジション表示が選択されました");
+                        TradeOutPut tradeRead = new TradeOutPut();
+                        List<Trade> trades = tradeRead.trades("C:/Users/18356/Downloads/2323.csv");
+                        Portoflio.getInstance().clear();
+                        for (Trade trade : trades) {
+                            Portoflio.getInstance().updatePosition(trade);
+                        }
+                        Position.printPosition(Portoflio.getInstance().getPositions());
+                        break;
