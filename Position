@@ -1,0 +1,135 @@
+public class Position {
+    private String code;
+    long quantity;
+    BigDecimal unitPrice;
+    BigDecimal marketValue = BigDecimal.ZERO;
+    BigDecimal profitAndLoss = BigDecimal.ZERO;
+    BigDecimal averageUnitPrice = BigDecimal.ZERO;
+    private BigDecimal col4 = BigDecimal.ZERO;
+    private BigDecimal col5 = BigDecimal.ZERO;
+    private BigDecimal col6 = BigDecimal.ZERO;
+
+    public void add(long quantity, BigDecimal unitPrice) {
+        BigDecimal oldValue = this.averageUnitPrice.multiply(new BigDecimal(this.quantity));
+        BigDecimal newValue = unitPrice.multiply(new BigDecimal(quantity));
+        this.averageUnitPrice = oldValue.add(newValue).divide(new BigDecimal((this.quantity)).add(new BigDecimal(quantity)), RoundingMode.HALF_UP);
+        this.quantity += quantity;
+        this.marketValue = this.marketValue.add(unitPrice.multiply(new BigDecimal(quantity)));
+    }
+
+    public BigDecimal sell(long quantity, BigDecimal unitPrice) {
+        if (this.quantity < quantity) {
+            return BigDecimal.ZERO;
+        }
+        this.quantity -= quantity;
+
+        this.col4 = this.col4.add(unitPrice.subtract(this.averageUnitPrice).multiply(new BigDecimal(quantity)));
+
+        this.marketValue = this.marketValue.subtract(unitPrice.multiply(new BigDecimal(quantity)));
+        return this.marketValue;
+    }
+
+    public Position(String code, long quantity, BigDecimal unitPrice) {
+        this.code = code;
+        this.unitPrice = unitPrice;
+        this.averageUnitPrice = unitPrice;
+        this.add(quantity, unitPrice);
+    }
+
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public BigDecimal getMarketValue() {
+        return marketValue;
+    }
+
+    public void setMarketValue(BigDecimal marketValue) {
+        this.marketValue = marketValue;
+    }
+
+    public BigDecimal getProfitAndLoss() {
+        return profitAndLoss;
+    }
+
+    public void setProfitAndLoss(BigDecimal profitAndLoss) {
+        this.profitAndLoss = profitAndLoss;
+    }
+
+
+    public BigDecimal getAverageUnitPrice() {
+        return averageUnitPrice;
+    }
+
+    public void setAverageUnitPrice(BigDecimal averageUnitPrice) {
+        this.averageUnitPrice = averageUnitPrice;
+    }
+
+    public BigDecimal getCol4() {
+        return col4;
+    }
+
+    public String getCol5() {
+        BigDecimal lastPrice = Portoflio.getInstance().getLastPrice(this.code);
+        if (lastPrice == null) {
+            return "---";
+        }
+
+        return new BigDecimal(this.quantity).multiply(lastPrice).toString();
+    }
+
+    public String getCol6() {
+        BigDecimal lastPrice = Portoflio.getInstance().getLastPrice(this.code);
+        if (lastPrice == null) {
+            return "---";
+        }
+
+        return new BigDecimal(this.quantity).multiply(lastPrice.subtract(this.averageUnitPrice)).toString();
+    }
+
+    public static void printPosition(List<Position> positions) {
+        final String dataFormat = "| %-4s | %12s | %12s | %14s | %14s | %14s |";
+        System.out.println("|" + "=======================================================================================" + "|");
+        System.out.printf(dataFormat, "Code", "Quantity", "avg price", "ProfitAndLoss", "col5", "col6");
+        System.out.println(" ");
+        System.out.println("|" + "------" + "+" + "--------------" + "+" + "--------------" + "+" + "----------------" + "+" + "----------------" + "+" + "----------------" + "|");
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+        decimalFormat.setRoundingMode(RoundingMode.DOWN);
+        for (Position item : positions) {
+            System.out.printf(dataFormat + "\n",
+                    item.getCode(),
+                    item.getQuantity(),
+                    decimalFormat.format(item.getAverageUnitPrice()),
+                    decimalFormat.format(item.getCol4()),
+                    (item.getCol5()),
+                    (item.getCol6())
+            );
+        }
+        System.out.println("=========================================================================================");
+    }
+
+    public static void sortPositions(List<Position> positions) {
+        positions.sort(Comparator.comparing(Position::getCode));
+    }
+}
